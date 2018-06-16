@@ -305,11 +305,14 @@ $ns: DateRangePicker !default;
   }
 
   &__FullDateStates {
+    background-color: #52575e;
     bottom: 0;
+    opacity: .6;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
+    z-index: 1000;
   }
 
   &__DateLabel {
