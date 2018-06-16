@@ -39,7 +39,7 @@
     }
   ],
   "license": "Apache-2.0",
-  "main": "dist/DateRangePicker.js",
+  "main": "dist/index.js",
   "keywords": [
     "react",
     "datepicker",
