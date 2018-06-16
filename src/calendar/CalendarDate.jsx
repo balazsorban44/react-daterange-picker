@@ -229,16 +229,16 @@ const CalendarDate = createClass({
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}
         onMouseDown={this.mouseDown}>
-        {numStates > 1 &&
+        {states.toJS().every(state => state.state === "available") ?
           <div className={this.cx({element: "HalfDateStates"})}>
             <CalendarDatePeriod period="am" color={amColor} />
             <CalendarDatePeriod period="pm" color={pmColor} />
-          </div>}
-        {numStates === 1 &&
-          <div className={this.cx({element: "FullDateStates"})} style={style} />}
+          </div> :
+          <div className={this.cx({element: "FullDateStates"})} style={style} />
+        }
         <span className={this.cx({element: "DateLabel"})}>{date.format('D')}</span>
-        {selectionModifier ? <CalendarSelection modifier={selectionModifier} pending={pending} /> : null}
-        {highlightModifier ? <CalendarHighlight modifier={highlightModifier} /> : null}
+        {selectionModifier && <CalendarSelection modifier={selectionModifier} pending={pending} />}
+        {highlightModifier && <CalendarHighlight modifier={highlightModifier} />}
       </td>
     );
   },

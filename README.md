@@ -72,9 +72,9 @@ Here is a working example:
 |initialRange|| |Object|
 |initialYear|Overrides values derived from initialDate/initialRange| |Integer|
 |locale||moment().locale()|String|
-|maximumDate|The last date that is possible to choose. Every date after will be unselectable|null|Moment or Date|
-|minimumDate|The earliest date that is possible to choose. Every date before will be unselectable |null|Moment or Date|
-|numberOfCalendars|The number of months showing next to each other|1|Integer|
+|max|The last date that is possible to choose. Every date after will be unselectable|null|Moment or Date|
+|min|The earliest date that is possible to choose. Every date before will be unselectable |null|Moment or Date|
+|numberOfMonths|The number of months showing next to each other|1|Integer|
 |onHighlightDate|Triggered when a date is highlighted (hovered)| |Function|
 |onHighlightRange|Triggered when a range is highlighted (hovered)| |Function|
 |onSelect|Triggered when a date or range is selected. returns `value`| | `({start, end}) => this.setState({start, end})` |

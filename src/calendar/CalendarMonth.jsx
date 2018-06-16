@@ -11,6 +11,8 @@ import CustomPropTypes from '../utils/CustomPropTypes';
 import isMomentRange from '../utils/isMomentRange';
 import PureRenderMixin from '../utils/PureRenderMixin';
 
+
+const today = moment();
 const CalendarMonth = createClass({
   mixins: [BemMixin, PureRenderMixin],
   displayName: "CalendarMonth",
@@ -69,7 +71,7 @@ const CalendarMonth = createClass({
     return (
       <CalendarDate
         key={i}
-        isToday={d.isSame(moment(), 'day')}
+        isToday={d.isSame(today, 'day')}
         isDisabled={!enabledRange.contains(d)}
         isHighlightedDate={!!(highlightedDate && highlightedDate.isSame(d, 'day'))}
         isHighlightedRangeStart={!!(highlightedRange && highlightedRange.start.isSame(d, 'day'))}

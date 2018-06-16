@@ -67,8 +67,8 @@ describe('The DateRangePicker component', function () {
         dateStates: dateStates,
         stateDefinitions: stateDefinitions,
         defaultState: 'available',
-        minimumDate: new Date(2001, 1, 15),
-        maximumDate: new Date(2001, 1, 20),
+        min: new Date(2001, 1, 15),
+        max: new Date(2001, 1, 20),
       });
     };
 
@@ -104,7 +104,7 @@ describe('The DateRangePicker component', function () {
 
     it('the left one gets disabled when we are at the start of the permitted period', function () {
       this.useShallowRenderer({
-        minimumDate: new Date(2000, 6, 15),
+        min: new Date(2000, 6, 15),
         initialYear: 2000,
         initialMonth: 6,
       });
@@ -113,7 +113,7 @@ describe('The DateRangePicker component', function () {
 
     it('the left one does not get disabled when we are not at the start of the permitted period', function () {
       this.useShallowRenderer({
-        minimumDate: new Date(2000, 1, 15),
+        min: new Date(2000, 1, 15),
         initialYear: 2000,
         initialMonth: 6,
       });
@@ -133,7 +133,7 @@ describe('The DateRangePicker component', function () {
 
     it('the right one gets disabled when we are at the end of the permitted period', function () {
       this.useShallowRenderer({
-        maximumDate: new Date(2000, 6, 15),
+        max: new Date(2000, 6, 15),
         initialYear: 2000,
         initialMonth: 6,
       });
@@ -142,7 +142,7 @@ describe('The DateRangePicker component', function () {
 
     it('the right one does not get disabled when we are not at the end of the permitted period', function () {
       this.useShallowRenderer({
-        maximumDate: new Date(2000, 6, 15),
+        max: new Date(2000, 6, 15),
         initialYear: 2000,
         initialMonth: 6,
       });
@@ -171,9 +171,9 @@ describe('The DateRangePicker component', function () {
         expect(this.renderedComponent.props.children[1][0].type).toBe(CalendarMonth);
       });
 
-      it('otherwise a number equal to props.numberOfCalendars', function () {
+      it('otherwise a number equal to props.numberOfMonths', function () {
         this.useShallowRenderer({
-          numberOfCalendars: 3,
+          numberOfMonths: 3,
         });
         expect(this.renderedComponent.props.children[1].length).toBe(3);
         expect(this.renderedComponent.props.children[1][0].type).toBe(CalendarMonth);
