@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import createClass from 'create-react-class';
 import moment from './moment-range';
 var fs = require('fs');
-import timekeeper from 'timekeeper';
 import RangePicker from '../src';
 
 import Header from './components/header';
@@ -19,7 +18,6 @@ import QuickSelection from './components/quick-selection';
 
 const today = moment();
 // freeze date to April 1st
-timekeeper.freeze(new Date('2016-04-01'));
 
 function processCodeSnippet(src) {
   var lines = src.split('\n');
