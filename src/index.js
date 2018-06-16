@@ -39,15 +39,15 @@ const DateRangePicker = createClass({
     disableNavigation: PropTypes.bool,
     firstOfWeek: PropTypes.oneOf([0, 1, 2, 3, 4, 5, 6]),
     helpMessage: PropTypes.string,
-    initialDate: PropTypes.instanceOf(Date),
+    initialDate: CustomPropTypes.moment,
     initialFromValue: PropTypes.bool,
     initialMonth: PropTypes.number, // Overrides values derived from initialDate/initialRange
     initialRange: PropTypes.object,
     initialYear: PropTypes.number, // Overrides values derived from initialDate/initialRange
     locale: PropTypes.string,
-    maximumDate: PropTypes.instanceOf(Date),
-    minimumDate: PropTypes.instanceOf(Date),
-    numberOfCalendars: PropTypes.number,
+    max: PropTypes.instanceOf(Date) || PropTypes.instanceOf(moment),
+    min: PropTypes.instanceOf(Date) || PropTypes.instanceOf(moment),
+    numberOfMonths: PropTypes.number,
     onHighlightDate: PropTypes.func, // triggered when a date is highlighted (hovered)
     onHighlightRange: PropTypes.func, // triggered when a range is highlighted (hovered)
     onSelect: PropTypes.func, // triggered when a date or range is selectec
@@ -62,19 +62,16 @@ const DateRangePicker = createClass({
   },
 
   getDefaultProps() {
-    let date = new Date();
-    let initialDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
     return {
       bemNamespace: null,
       bemBlock: 'DateRangePicker',
       className: '',
-      numberOfCalendars: 1,
+      numberOfMonths: 1,
       firstOfWeek: 0,
       disableNavigation: false,
       nextLabel: '',
       previousLabel: '',
-      initialDate: initialDate,
+      initialDate: moment(),
       initialFromValue: true,
       locale: moment().locale(),
       selectionType: 'range',
@@ -106,12 +103,12 @@ const DateRangePicker = createClass({
   componentWillReceiveProps(nextProps) {
     const nextDateStates = this.getDateStates(nextProps);
     const nextEnabledRange = this.getEnabledRange(nextProps);
-
+    const {dateStates, enabledRange} = this.state;
     const updatedState = {
       selectedStartDate: null,
       hideSelection: false,
-      dateStates: this.state.dateStates && Immutable.is(this.state.dateStates, nextDateStates) ? this.state.dateStates : nextDateStates,
-      enabledRange: this.state.enabledRange && this.state.enabledRange.isSame(nextEnabledRange) ? this.state.enabledRange : nextEnabledRange,
+      dateStates: dateStates && Immutable.is(dateStates, nextDateStates) ? dateStates : nextDateStates,
+      enabledRange: enabledRange && enabledRange.isSame(nextEnabledRange) ? enabledRange : nextEnabledRange,
     };
 
     if (hasUpdatedValue(this.props, nextProps)) {
@@ -127,10 +124,10 @@ const DateRangePicker = createClass({
   },
 
   getInitialState() {
-    let now = new Date();
-    let {initialYear, initialMonth, initialFromValue, value} = this.props;
-    let year = now.getFullYear();
-    let month = now.getMonth();
+    const now = moment();
+    const {initialYear, initialMonth, initialFromValue, value} = this.props;
+    let year = now.year();
+    let month = now.month();
 
     if (Number.isInteger(initialYear) && Number.isInteger(initialMonth)) {
       year = initialYear;
@@ -144,8 +141,8 @@ const DateRangePicker = createClass({
     }
 
     return {
-      year: year,
-      month: month,
+      year,
+      month,
       selectedStartDate: null,
       highlightedDate: null,
       highlightRange: null,
@@ -156,8 +153,8 @@ const DateRangePicker = createClass({
   },
 
   getEnabledRange(props) {
-    let min = props.minimumDate ? moment(props.minimumDate).startOf('day') : absoluteMinimum;
-    let max = props.maximumDate ? moment(props.maximumDate).startOf('day') : absoluteMaximum;
+    const min = props.min ? moment(props.min).startOf('day') : absoluteMinimum;
+    const max = props.max ? moment(props.max).startOf('day') : absoluteMaximum;
 
     return moment.range(min, max);
   },
@@ -165,9 +162,9 @@ const DateRangePicker = createClass({
   getDateStates(props) {
     let {dateStates, defaultState, stateDefinitions} = props;
     let actualStates = [];
-    let minDate = absoluteMinimum;
+    let min = absoluteMinimum;
     let maxDate = absoluteMaximum;
-    let dateCursor = moment(minDate).startOf('day');
+    let dateCursor = moment(min).startOf('day');
 
     let defs = Immutable.fromJS(stateDefinitions);
 
@@ -380,12 +377,12 @@ const DateRangePicker = createClass({
   },
 
   isStartOrEndVisible(props) {
-    const { value, selectionType, numberOfCalendars } = props;
+    const { value, selectionType, numberOfMonths } = props;
 
     const isVisible = (date) => {
       const yearMonth = getYearMonth(date);
       const isSameYear = (yearMonth.year === this.state.year);
-      const isMonthVisible = (yearMonth.month === this.state.month) || (numberOfCalendars === 2 && (yearMonth.month - 1 === this.state.month));
+      const isMonthVisible = (yearMonth.month === this.state.month) || (numberOfMonths === 2 && (yearMonth.month - 1 === this.state.month));
 
       return isSameYear && isMonthVisible;
     };
@@ -398,10 +395,9 @@ const DateRangePicker = createClass({
   },
 
   canMoveBack() {
-    if (this.getMonthDate().subtract(1, 'days').isBefore(this.state.enabledRange.start)) {
-      return false;
-    }
-    return true;
+    return this.getMonthDate()
+            .subtract(1, 'months')
+            .isAfter(this.state.enabledRange.start);
   },
 
   moveBack() {
@@ -415,10 +411,9 @@ const DateRangePicker = createClass({
   },
 
   canMoveForward() {
-    if (this.getMonthDate().add(this.props.numberOfCalendars, 'months').isAfter(this.state.enabledRange.end)) {
-      return false;
-    }
-    return true;
+    return this.getMonthDate()
+            .add(this.props.numberOfMonths, 'months')
+            .isBefore(this.state.enabledRange.end);
   },
 
   moveForward() {
@@ -466,7 +461,7 @@ const DateRangePicker = createClass({
       bemBlock,
       bemNamespace,
       firstOfWeek,
-      numberOfCalendars,
+      numberOfMonths,
       selectionType,
       value,
     } = this.props;
@@ -519,7 +514,7 @@ const DateRangePicker = createClass({
       key,
       selectionType,
       value,
-      maxIndex: numberOfCalendars - 1,
+      maxIndex: numberOfMonths - 1,
       firstOfMonth: monthDate,
       onMonthChange: this.changeMonth,
       onYearChange: this.changeYear,
@@ -535,9 +530,9 @@ const DateRangePicker = createClass({
   },
 
   render: function() {
-    let {paginationArrowComponent: PaginationArrowComponent, className, numberOfCalendars, stateDefinitions, selectedLabel, showLegend, helpMessage} = this.props;
+    let {paginationArrowComponent: PaginationArrowComponent, className, numberOfMonths, stateDefinitions, selectedLabel, showLegend, helpMessage} = this.props;
 
-    let calendars = Immutable.Range(0, numberOfCalendars).map(this.renderCalendar);
+    let calendars = Immutable.Range(0, numberOfMonths).map(this.renderCalendar);
     className = this.cx({element: null}) + ' ' + className;
 
     return (
